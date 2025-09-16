@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚚 Seguimiento de Envío #RR789456123MX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+
+        .tracking-number {
+            font-size: 1rem;
+            word-break: break-all;
+            padding: 0 10px;
+        }
+
+        .tracking-info {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 15px;
+        }
+
+        .progress-section, .map-section {
+            width: 100%;
+        }
+
+        .progress-section {
+            order: 2;
+            margin-top: 20px;
+        }
+
+        .map-section {
+            order: 1;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            width: 25%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .status-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 30px 0 15px;
+        }
+
+        .status-step {
+            text-align: center;
+            width: 20%;
+            position: relative;
+            z-index: 2;
+            font-size: 0.75rem;
+        }
+
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            background: #bdc3c7;
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .step-active .step-icon {
+            background: #3498db;
+        }
+
+        .step-completed .step-icon {
+            background: #2ecc71;
+        }
+
+        .location-image {
+            width: 100%;
+            height: 250px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+                        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23f8f9fa"/><path d="M200,50 L250,120 L180,150 L200,200 L150,170 L100,250 L120,120 L50,100 L130,80 Z" fill="%233498db" stroke="%232c3e50" stroke-width="3"/><circle cx="200" cy="50" r="15" fill="%23e74c3c" stroke="%23fff" stroke-width="3"/><text x="200" y="280" font-family="Arial" font-size="16" text-anchor="middle" fill="%232c3e50">Punto de partida - Ciudad de México</text></svg>');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .location-pin {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: #e74c3c;
+            border: 3px solid white;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            top: 40%;
+            left: 50%;
+            margin-left: -15px;
+            margin-top: -15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: rotate(-45deg) scale(1); }
+            50% { transform: rotate(-45deg) scale(1.1); }
+            100% { transform: rotate(-45deg) scale(1); }
+        }
+
+        .location-info {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .interval-info {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #3498db;
+            color: white;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-update {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-update:hover {
+            background: #2980b9;
+        }
+
+        .btn-auto {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-auto.toggled {
+            background: #f39c12;
+        }
+
+        .btn-auto:hover {
+            background: #27ae60;
+        }
+
+        .btn-auto.toggled:hover {
+            background: #e67e22;
+        }
+
+        .btn-reset {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #c0392b;
+        }
+
+        .history-section {
+            padding: 20px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 12px;
+            background: white;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            font-size: 0.9rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #2c3e50;
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 10px 0;
+            font-size: 0.9rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .status-preparation { background: #f39c12; color: white; }
+        .status-transit { background: #3498db; color: white; }
+        .status-delivered { background: #2ecc71; color: white; }
+
+        /* Mejoras para tablets */
+        @media (min-width: 768px) {
+            .tracking-info {
+                flex-direction: row;
+                gap: 30px;
+            }
+            
+            .progress-section {
+                order: 1;
+                flex: 1;
+                margin-top: 0;
+            }
+            
+            .map-section {
+                order: 2;
+                flex: 1;
+            }
+            
+            .btn {
+                flex: none;
+            }
+        }
+
+        /* Mejoras para desktop */
+        @media (min-width: 992px) {
+            body {
+                padding: 30px;
+            }
+            
+            .container {
+                max-width: 900px;
+            }
+            
+            .tracking-info {
+                padding: 30px;
+            }
+            
+            .history-section {
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📦 Seguimiento de Envío</h1>
+            <p class="tracking-number">Número de tracking: <strong>RR789456123MX</strong></p>
+        </header>
+
+        <div class="tracking-info">
+            <div class="progress-section">
+                <h2 class="section-title">Estado del Envío</h2>
+                <div id="current-status" class="status-badge status-preparation">Preparación</div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+
+                <div class="status-steps">
+                    <div class="status-step step-completed">
+                        <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                        <div>Guia Generada</div>
+                    </div>
+                    <div class="status-step step-active">
+                        <div class="step-icon"><i class="fas fa-clock"></i></div>
+                        <div>En espera</div>
+                    </div>
+                    <div class="status-step">
+                        <div class="step-icon"><i class="fas fa-truck"></i></div>
+                        <div>Tránsito</div>
+                    </div>
+                    <div class="status-step">
+                        <div class="step-icon"><i class="fas fa-package"></i></div>
+                        <div>Reparto</div>
+                    </div>
+                    <div class="status-step">
+                        <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                        <div>Entregado</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-section">
+                <h2 class="section-title">Ubicación Actual</h2>
+                <div class="location-image">
+                    <div class="location-pin"></div>
+                </div>
+                <div id="location-info" class="location-info">Centro de distribución - Ciudad de México</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="interval-info">
+                <i class="fas fa-info-circle"></i> Actualización automática cada 30 segundos
+            </div>
+            
+                   </div>
+
+        <div class="history-section">
+            <h2 class="section-title">📋 Historial de Actualizaciones</h2>
+            <div id="history-list" class="history-list">
+                <div class="history-item">
+                    <strong>[16/09/2024 10:30]</strong> - Orden recibida y confirmada
+                </div>
+                <div class="history-item">
+                    <strong>[16/09/2024 10:25]</strong> - Sistema de seguimiento iniciado
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>link Tracking© 2025</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configuración inicial
+        const trackingSteps = [
+            {
+                status: "Orden confirmada",
+                progress: 0,
+                location: "Centro de distribución - Ciudad de México",
+                message: "Orden recibida y confirmada"
+            },
+            {
+                status: "Preparación",
+                progress: 25,
+                location: "Centro de distribución - Ciudad de México",
+                message: "Paquete en preparación"
+            },
+            {
+                status: "En tránsito",
+                progress: 50,
+                location: "En camino a Toluca",
+                message: "En camino al centro de distribución"
+            },
+            {
+                status: "En almacén",
+                progress: 75,
+                location: "Almacén regional - Toluca",
+                message: "Llegada a almacén regional"
+            },
+            {
+                status: "En reparto",
+                progress: 90,
+                location: "En reparto local",
+                message: "En reparto local"
+            },
+            {
+                status: "Entregado",
+                progress: 100,
+                location: "Destino final - Querétaro",
+                message: "Paquete entregado con éxito"
+            }
+        ];
+
+        let currentStep = 1;
+        let autoUpdateInterval;
+        const updateInterval = 30000; // 30 segundos
+
+        // Actualizar estado
+        function updateStatus() {
+            if (currentStep < trackingSteps.length) {
+                const step = trackingSteps[currentStep];
+                
+                // Actualizar progreso
+                document.getElementById('progress-fill').style.width = step.progress + '%';
+                
+                // Actualizar texto de estado
+                const statusBadge = document.getElementById('current-status');
+                statusBadge.textContent = step.status;
+                
+                // Actualizar clase de estado
+                statusBadge.className = 'status-badge ';
+                if (step.status.includes('Preparación')) {
+                    statusBadge.classList.add('status-preparation');
+                } else if (step.status.includes('tránsito') || step.status.includes('reparto')) {
+                    statusBadge.classList.add('status-transit');
+                } else if (step.status.includes('Entregado')) {
+                    statusBadge.classList.add('status-delivered');
+                }
+                
+                // Actualizar información de ubicación
+                document.getElementById('location-info').textContent = step.location;
+                
+                // Actualizar historial
+                const now = new Date();
+                const timestamp = now.toLocaleString('es-ES');
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = <strong>[${timestamp}]</strong> - ${step.message};
+                document.getElementById('history-list').prepend(historyItem);
+                
+                // Actualizar steps visuales
+                updateStepVisuals();
+                
+                currentStep++;
+            } else {
+                alert('¡El paquete ha sido entregado con éxito!');
+                clearInterval(autoUpdateInterval);
+                document.getElementById('auto-update').innerHTML = '<i class="fas fa-play-circle"></i> Iniciar';
+                document.getElementById('auto-update').classList.remove('toggled');
+            }
+        }
+
+        function updateStepVisuals() {
+            const steps = document.querySelectorAll('.status-step');
+            steps.forEach((step, index) => {
+                step.classList.remove('step-active', 'step-completed');
+                if (index < currentStep) {
+                    step.classList.add('step-completed');
+                } else if (index === currentStep) {
+                    step.classList.add('step-active');
+                }
+            });
+        }
+
+        function toggleAutoUpdate() {
+            if (autoUpdateInterval) {
+                clearInterval(autoUpdateInterval);
+                autoUpdateInterval = null;
+                document.getElementById('auto-update').innerHTML = '<i class="fas fa-play-circle"></i> Iniciar';
+                document.getElementById('auto-update').classList.remove('toggled');
+            } else {
+                autoUpdateInterval = setInterval(updateStatus, updateInterval);
+                document.getElementById('auto-update').innerHTML = '<i class="fas fa-pause-circle"></i> Pausar';
+                document.getElementById('auto-update').classList.add('toggled');
+            }
+        }
+
+        function resetSimulation() {
+            currentStep = 1;
+            document.getElementById('progress-fill').style.width = '25%';
+            document.getElementById('current-status').textContent = 'Preparación';
+            document.getElementById('current-status').className = 'status-badge status-preparation';
+            document.getElementById('location-info').textContent = 'Centro de distribución - Ciudad de México';
+            
+            // Mantener solo el primer elemento del historial
+            const historyList = document.getElementById('history-list');
+            const firstItem = historyList.querySelector('.history-item');
+            historyList.innerHTML = '';
+            historyList.appendChild(firstItem);
+            
+            updateStepVisuals();
+            
+            // Reiniciar la actualización automática si estaba activa
+            if (autoUpdateInterval) {
+                clearInterval(autoUpdateInterval);
+                autoUpdateInterval = setInterval(updateStatus, updateInterval);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('update-btn').addEventListener('click', updateStatus);
+        document.getElementById('auto-update').addEventListener('click', toggleAutoUpdate);
+        document.getElementById('reset-btn').addEventListener('click', resetSimulation);
+
+        // Inicializar - Comienza la actualización automática
+        window.onload = function() {
+            updateStepVisuals();
+            // Iniciar la actualización automática cada 30 segundos
+            autoUpdateInterval = setInterval(updateStatus, updateInterval);
+        };
+    </script>
+</body>
+</html>
